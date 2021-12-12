@@ -25,7 +25,7 @@ int main() {
 	int f;
 	f = fork(); //creates separate process based on current one, new proc = child
 	
-	if(f) { 
+	if(f == 0) { 
 	
 		//parent
 		//good idea to close the end of pipe you are not using
@@ -44,7 +44,7 @@ int main() {
 			
 			//displays the response to the user
 			char s[20];
-			read(parent[READ], s, sizeof(s));
+			read(parent[READ], s, sizeof(s)); //reading from parent
 			printf("response from child: %s\n", s);
 		}
 		
@@ -56,15 +56,15 @@ int main() {
 		
 		//gets input from parent
 		char s[20]; 
-		while(read(child[READ], s, sizeof(s))) {
+		while(read(child[READ], s, sizeof(s))) { //reading from child
 		
 		//processes the input: any of a number of string processes (all caps, all lower, reverse)
 			s[strlen(s) - 1] = '\0';
-			strcat(s, ":)");
+			strcat(s, ":)"); //adding 
 			s[strlen(s)] = '\0';
 			
 			//sends the response to parent
-			write(parent[WRITE], s, strlen(s) + 1);
+			write(parent[WRITE], s, strlen(s) + 1); //writing into parent
 			s[0] = '\0';
 		}
 	}
