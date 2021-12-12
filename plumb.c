@@ -8,6 +8,8 @@
 #define WRITE 1
 
 //design a program that uses unnamed pipes to facilitate parent/child process communication
+//a pipe is a conduit in memory between 2 separate processes on the same comp
+//2 ends: read end [0] and write end [1]
 int main() {
 
 	//in order to facilitate 2 way communication, you will need 2 pipes
@@ -21,15 +23,16 @@ int main() {
 	pipe(parent);
 	
 	int f;
-	f = fork();
+	f = fork(); //creates separate process based on current one, new proc = child
 	
-	if(f) {
+	if(f) { 
 	
 		//parent
-		close(child[READ]);
+		//good idea to close the end of pipe you are not using
+		close(child[READ]); 
 		close(parent[WRITE]);
 		
-		while(1) {
+		while(1) { //if parent process ends before child, childs new parent pid is 1
 		
 			//constantly prompts a user for input
 			printf("input: ");
@@ -37,7 +40,7 @@ int main() {
 			//sends that input to child 
 			char line[20];
 			fgets(line, 20, stdin);
-			write(child[WRITE], line, sizeof(line));
+			write(child[WRITE], line, sizeof(line)); //writing into child line in size bytes
 			
 			//displays the response to the user
 			char s[20];
@@ -52,7 +55,7 @@ int main() {
 		close(child[WRITE]);
 		
 		//gets input from parent
-		char s[20];
+		char s[20]; 
 		while(read(child[READ], s, sizeof(s))) {
 		
 		//processes the input: any of a number of string processes (all caps, all lower, reverse)
@@ -66,6 +69,6 @@ int main() {
 		}
 	}
 
-	return 0;	
+	return 0; //returns 0 if pipe was created, -1 if not
 }
 
