@@ -25,8 +25,28 @@ int main() {
 	int f;
 	f = fork(); //creates separate process based on current one, new proc = child
 	
-	if(f == 0) { 
+	if(f == 0) { //true if child
 	
+		//child
+		close(parent[READ]);
+		close(child[WRITE]);
+		
+		//gets input from parent
+		char s[20]; 
+		while(read(child[READ], s, sizeof(s))) { //reading from child
+		
+		//processes the input: any of a number of string processes (all caps, all lower, reverse)
+			s[strlen(s) - 1] = '\0';
+			strcat(s, ":)"); //adding 
+			s[strlen(s)] = '\0';
+			
+			//sends the response to parent
+			write(parent[WRITE], s, strlen(s) + 1); //writing into parent
+			s[0] = '\0';
+		}
+		
+	} else {
+		
 		//parent
 		//good idea to close the end of pipe you are not using
 		close(child[READ]); 
@@ -48,25 +68,6 @@ int main() {
 			printf("response from child: %s\n", s);
 		}
 		
-	} else {
-	
-		//child
-		close(parent[READ]);
-		close(child[WRITE]);
-		
-		//gets input from parent
-		char s[20]; 
-		while(read(child[READ], s, sizeof(s))) { //reading from child
-		
-		//processes the input: any of a number of string processes (all caps, all lower, reverse)
-			s[strlen(s) - 1] = '\0';
-			strcat(s, ":)"); //adding 
-			s[strlen(s)] = '\0';
-			
-			//sends the response to parent
-			write(parent[WRITE], s, strlen(s) + 1); //writing into parent
-			s[0] = '\0';
-		}
 	}
 
 	return 0; //returns 0 if pipe was created, -1 if not
